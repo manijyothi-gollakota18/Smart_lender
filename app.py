@@ -7,7 +7,7 @@ from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__)
 
 # Load the saved model and feature mappings
-MODEL_PATH = "model.pkl"
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.pkl")
 model_data = None
 
 def load_model():
