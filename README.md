@@ -90,6 +90,10 @@ The project structure consists of the following key files:
 
 ### 8. Project Demonstration
 
+#### Live Deployment
+The application is live and accessible on Vercel:
+* **Production Link**: [https://smart-lender-woad.vercel.app](https://smart-lender-woad.vercel.app)
+
 #### Local Execution Instruction
 1. Install dependencies:
    ```bash
