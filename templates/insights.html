@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 3rem;">
+    <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #fff, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Exploratory Data Analysis & Model Metrics</h1>
+    <p style="color: var(--text-secondary);">Visualize relationships within the loan applicant dataset and review training performance across algorithms.</p>
+</div>
+
+<!-- EDA Charts Section -->
+<div class="charts-grid">
+    <!-- Chart 1 -->
+    <div class="glass-card chart-card">
+        <h3>Loan Approvals by Credit History</h3>
+        <div class="chart-img-container">
+            <img src="{{ url_for('static', filename='plots/count_plot.png') }}" alt="Credit History Count Plot">
+        </div>
+        <p>A credit history status of 1.0 (Good) is the strongest positive predictor of loan approval. Applicants with bad or no credit history (0.0) are almost universally declined.</p>
+    </div>
+
+    <!-- Chart 2 -->
+    <div class="glass-card chart-card">
+        <h3>Applicant Income Distribution</h3>
+        <div class="chart-img-container">
+            <img src="{{ url_for('static', filename='plots/dist_plot.png') }}" alt="Applicant Income Distribution">
+        </div>
+        <p>Most applicants have monthly incomes concentrated below $10,000, with a long right tail of high-earning individuals requesting larger loans.</p>
+    </div>
+
+    <!-- Chart 3 -->
+    <div class="glass-card chart-card" style="grid-column: span 2; max-width: 800px; margin: 0 auto; width: 100%;">
+        <h3>Average Loan Amount by Education & Status</h3>
+        <div class="chart-img-container">
+            <img src="{{ url_for('static', filename='plots/bar_chart.png') }}" alt="Education vs Loan Amount Bar Chart">
+        </div>
+        <p>Graduates on average request and receive larger loans compared to non-graduates. Approved loans (Y) tend to have slightly lower or comparable averages to declined ones within groups, indicating strict debt-to-income checks.</p>
+    </div>
+</div>
+
+<!-- Machine Learning Metrics Comparison -->
+<section class="metrics-section">
+    <h2>Model Performance Leaderboard</h2>
+    <div class="table-responsive">
+        <table class="metrics-table">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Training Accuracy</th>
+                    <th>Testing Accuracy</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="highlight-row">
+                    <td>XGBoost Classifier</td>
+                    <td>94.70%</td>
+                    <td>81.30%</td>
+                    <td><span style="color: var(--success);"><i class="fa-solid fa-circle-check"></i> Selected for Production</span></td>
+                </tr>
+                <tr>
+                    <td>Random Forest Classifier</td>
+                    <td>82.48%</td>
+                    <td>85.37%</td>
+                    <td><span>Candidate</span></td>
+                </tr>
+                <tr>
+                    <td>Decision Tree Classifier</td>
+                    <td>82.48%</td>
+                    <td>82.11%</td>
+                    <td><span>Candidate</span></td>
+                </tr>
+                <tr>
+                    <td>K-Nearest Neighbors (KNN)</td>
+                    <td>70.47%</td>
+                    <td>66.67%</td>
+                    <td><span>Candidate</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

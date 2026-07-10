@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="result-card glass-card {{ 'result-approved' if eligible else 'result-rejected' }}">
+    <div class="result-badge">
+        {% if eligible %}
+            <i class="fa-solid fa-circle-check"></i>
+        {% else %}
+            <i class="fa-solid fa-circle-xmark"></i>
+        {% endif %}
+    </div>
+
+    <h2>
+        {% if eligible %}
+            LOAN ELIGIBLE
+        {% else %}
+            LOAN DECLINED
+        {% endif %}
+    </h2>
+
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        {% if eligible %}
+            This applicant matches low-risk profile criteria. The application can be fast-tracked for credit approval.
+        {% else %}
+            This applicant represents a high-risk profile. Additional documentation or manual underwriter review is recommended.
+        {% endif %}
+    </p>
+
+    <!-- Confidence Indicator -->
+    <div style="margin: 2rem 0; text-align: left;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary);">
+            <span>Model Prediction Confidence:</span>
+            <span>{{ "%.1f"|format(confidence * 100) }}%</span>
+        </div>
+        <div class="confidence-bar-container">
+            <div class="confidence-bar" style="width: {{ confidence * 100 }}%"></div>
+        </div>
+    </div>
+
+    <div class="result-details">
+        <div class="detail-item">
+            <span>Gender:</span> <strong>{{ input_data.gender }}</strong>
+        </div>
+        <div class="detail-item">
+            <span>Married:</span> <strong>{{ input_data.married }}</strong>
+        </div>
+        <div class="detail-item">
+            <span>Education:</span> <strong>{{ input_data.education }}</strong>
+        </div>
+        <div class="detail-item">
+            <span>Self Employed:</span> <strong>{{ input_data.self_employed }}</strong>
+        </div>
+        <div class="detail-item">
+            <span>Credit History:</span> 
+            <strong>
+                {% if input_data.credit_history == '1.0' %}
+                    Good (1.0)
+                {% else %}
+                    Bad/None (0.0)
+                {% endif %}
+            </strong>
+        </div>
+        <div class="detail-item">
+            <span>Property Area:</span> <strong>{{ input_data.property_area }}</strong>
+        </div>
+        <div class="detail-item">
+            <span>Monthly Income:</span> <strong>${{ "{:,.2f}".format(input_data.applicant_income) }}</strong>
+        </div>
+        <div class="detail-item">
+            <span>Loan Amount:</span> <strong>${{ "{:,.2f}".format(input_data.loan_amount * 1000) }}</strong>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2.5rem;">
+        <a href="/predict" class="btn btn-primary">
+            <i class="fa-solid fa-rotate-left"></i> Predict New Application
+        </a>
+        <a href="/insights" class="btn btn-secondary">
+            <i class="fa-solid fa-chart-pie"></i> View Insights
+        </a>
+    </div>
+</div>
+{% endblock %}

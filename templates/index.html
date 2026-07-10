@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero">
+    <h1>Instant, AI-Powered Loan Eligibility Prediction</h1>
+    <p>
+        Smart Lender utilizes cutting-edge classification algorithms to instantly evaluate loan applicant risk. 
+        Empower your credit division, optimize loan portfolios, and reduce non-performing assets through automated credit evaluation.
+    </p>
+    <div style="display: flex; gap: 1.5rem; justify-content: center;">
+        <a href="/predict" class="btn btn-primary">
+            <i class="fa-solid fa-calculator"></i> Predict Eligibility
+        </a>
+        <a href="/insights" class="btn btn-secondary">
+            <i class="fa-solid fa-chart-line"></i> View Insights & Model Metrics
+        </a>
+    </div>
+</section>
+
+<section class="features-grid">
+    <div class="glass-card feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
+        <h3>Advanced Classifiers</h3>
+        <p>Trained using Decision Tree, Random Forest, K-Nearest Neighbors (KNN), and XGBoost algorithms to evaluate risk multi-dimensionally.</p>
+    </div>
+    
+    <div class="glass-card feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-gauge-high"></i></div>
+        <h3>Real-time Predictions</h3>
+        <p>Get instant eligibility reports with visual risk indicators, tailored for fast-track low-risk applicants and manual verification overrides.</p>
+    </div>
+
+    <div class="glass-card feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-chart-pie"></i></div>
+        <h3>Analytics Dashboard</h3>
+        <p>Interactive EDA visualizations show relationships between demographic data (education, gender, area) and approval outcomes.</p>
+    </div>
+</section>
+
+<div class="glass-card" style="margin-top: 2rem;">
+    <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent); font-weight: 700;">Operational Workflows Supported</h3>
+    <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem;">
+        <li style="display: flex; gap: 1rem; align-items: flex-start;">
+            <i class="fa-solid fa-circle-check" style="color: var(--success); margin-top: 0.25rem;"></i>
+            <div>
+                <strong>Fast-Track Approval:</strong> Salaried applicants with robust credit history and stable income are automatically cleared for rapid processing, minimizing overhead.
+            </div>
+        </li>
+        <li style="display: flex; gap: 1rem; align-items: flex-start;">
+            <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; margin-top: 0.25rem;"></i>
+            <div>
+                <strong>High-Risk Safeguard:</strong> Applicants without established credit history or displaying erratic income profiles are flagged for comprehensive background audits.
+            </div>
+        </li>
+        <li style="display: flex; gap: 1rem; align-items: flex-start;">
+            <i class="fa-solid fa-users-gear" style="color: var(--primary); margin-top: 0.25rem;"></i>
+            <div>
+                <strong>Analyst Batch Evaluation:</strong> Speeds up overall pipeline throughput during periods of high application volume while maintaining strict regulatory compliance.
+            </div>
+        </li>
+    </ul>
+</div>
+{% endblock %}
