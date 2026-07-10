@@ -1,26 +1,31 @@
 import os
-import pickle
+import json
 import numpy as np
-import pandas as pd
+import xgboost as xgb
 from flask import Flask, request, render_template, redirect, url_for
 
 app = Flask(__name__)
 
-# Load the saved model and feature mappings
-MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.pkl")
-model_data = None
+# Paths for the saved XGBoost booster and metadata
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.json")
+METADATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "metadata.json")
+
+bst = None
+metadata = None
 
 def load_model():
-    global model_data
-    if os.path.exists(MODEL_PATH):
+    global bst, metadata
+    if os.path.exists(MODEL_PATH) and os.path.exists(METADATA_PATH):
         try:
-            with open(MODEL_PATH, "rb") as f:
-                model_data = pickle.load(f)
-            print("Successfully loaded model from model.pkl")
+            bst = xgb.Booster()
+            bst.load_model(MODEL_PATH)
+            with open(METADATA_PATH, "r") as f:
+                metadata = json.load(f)
+            print("Successfully loaded native XGBoost model and metadata.")
         except Exception as e:
             print(f"Error loading model: {e}")
     else:
-        print(f"Warning: model.pkl not found. Please run train_model.py first.")
+        print("Warning: model.json or metadata.json not found. Run train_model.py first.")
 
 # Load model on startup
 load_model()
@@ -31,13 +36,13 @@ def index():
 
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    global model_data
+    global bst, metadata
     if request.method == 'POST':
-        # Ensure model is loaded; try reloading if None
-        if model_data is None:
+        # Ensure model and metadata are loaded; try reloading if None
+        if bst is None or metadata is None:
             load_model()
-            if model_data is None:
-                return "Error: Machine learning model is not trained/loaded. Please run training script first.", 500
+            if bst is None or metadata is None:
+                return "Error: Machine learning model is not trained/loaded.", 500
                 
         try:
             # Retrieve values from POST form request
@@ -68,8 +73,8 @@ def predict():
                 'property_area': property_area
             }
 
-            # Map the categories to matches used during training
-            mappings = model_data['mappings']
+            # Map the categories to numerical matches used during training
+            mappings = metadata['mappings']
             
             gender_num = mappings['Gender'].get(gender, 1)
             married_num = mappings['Married'].get(married, 1)
@@ -78,36 +83,30 @@ def predict():
             self_employed_num = mappings['Self_Employed'].get(self_employed, 0)
             property_area_num = mappings['Property_Area'].get(property_area, 1)
 
-            # Build prediction dataframe with exact matching feature names and ordering
-            features_dict = {
-                'Gender': [gender_num],
-                'Married': [married_num],
-                'Dependents': [dependents_num],
-                'Education': [education_num],
-                'Self_Employed': [self_employed_num],
-                'ApplicantIncome': [applicant_income],
-                'CoapplicantIncome': [coapplicant_income],
-                'LoanAmount': [loan_amount],
-                'Loan_Amount_Term': [loan_term],
-                'Credit_History': [credit_history],
-                'Property_Area': [property_area_num]
-            }
-            
-            features_df = pd.DataFrame(features_dict)
-            
-            # Predict
-            model = model_data['model']
-            prediction = model.predict(features_df)[0]
-            
-            # Get probability scores
-            try:
-                probabilities = model.predict_proba(features_df)[0]
-                confidence = float(probabilities[prediction])
-            except Exception:
-                confidence = 1.0
+            # Build prediction features list in the exact order expected by the model
+            feature_values = [
+                gender_num,
+                married_num,
+                dependents_num,
+                education_num,
+                self_employed_num,
+                applicant_income,
+                coapplicant_income,
+                loan_amount,
+                loan_term,
+                credit_history,
+                property_area_num
+            ]
 
-            # Prediction outcome: 1 is eligible (Y), 0 is ineligible (N)
-            eligible = bool(prediction == 1)
+            # Construct DMatrix directly from 2D array representation
+            dmat = xgb.DMatrix([feature_values], feature_names=metadata['feature_names'])
+            
+            # Predict probability of approval (binary model outputs probability of class 1)
+            prob = float(bst.predict(dmat)[0])
+            
+            # Prediction outcome: class 1 is Y (eligible), class 0 is N (declined)
+            eligible = bool(prob >= 0.5)
+            confidence = prob if eligible else (1.0 - prob)
 
             return render_template('result.html', eligible=eligible, confidence=confidence, input_data=input_data)
 
